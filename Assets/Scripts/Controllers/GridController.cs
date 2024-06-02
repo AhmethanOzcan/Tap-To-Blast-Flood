@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class GridController : MonoBehaviour
 {
+    [Header("Variables")]
+    [SerializeField] float _boardTweenTime = 0.5f;
     SpriteRenderer _spriteRenderer;
     EdgeCollider2D[] _borders;
     int _width;
@@ -19,10 +21,19 @@ public class GridController : MonoBehaviour
     }
 
     private void Start() {
+        StartCoroutine(TileCreationRoutine());
+    }
+
+    private IEnumerator TileCreationRoutine()
+    {
+        transform.localScale = Vector2.zero;
         SetSizes();
         HandleGridSize();
+        transform.LeanScale(Vector2.one, _boardTweenTime).setEaseInOutBounce();
+        yield return new WaitForSeconds(_boardTweenTime);
         HandleBorders();
         CreateSpawnPoints();
+        TileManager.Instance.FillGrid();
     }
 
     private void CreateSpawnPoints()
@@ -32,12 +43,14 @@ public class GridController : MonoBehaviour
         _worldPosition.x -= (_width /2) * _tileSize;
         if(_width % 2 == 0) 
             _worldPosition.x += _tileSize/2f;
+        TileManager.Instance._spawnPoints.Clear();
         for(int i = 0; i < _width; i++)
         {
             GameObject _spawnPoint = new GameObject(i.ToString());
             _spawnPoint.transform.position = _worldPosition;
             _spawnPoint.transform.parent = GameObject.Find("Spawn Points").transform;
             _worldPosition.x += _tileSize;
+            TileManager.Instance._spawnPoints.Add(_spawnPoint.transform);
         }
     }
 
@@ -45,7 +58,7 @@ public class GridController : MonoBehaviour
     {
         _width      = LevelManager.Instance._levelList[LevelManager.Instance._activeLevel-1].grid_width;
         _height     = LevelManager.Instance._levelList[LevelManager.Instance._activeLevel-1].grid_height;
-        _tileSize   = 0.4f;
+        _tileSize   = TileManager.Instance._tilePrefab.GetComponent<BoxCollider2D>().size.x + 0.02f;
     }
 
     private void HandleBorders()

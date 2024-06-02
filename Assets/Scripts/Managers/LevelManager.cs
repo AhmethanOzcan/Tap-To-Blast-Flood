@@ -9,11 +9,12 @@ public class LevelManager : Singleton<LevelManager>
     public List<Level> _levelList = new List<Level>();
     public int _activeLevel{get; private set;}
     [SerializeField] string _folderPath = "Assets/Levels";
+    public delegate void LevelChanged();
+    public event LevelChanged OnLevelChanged;
 
     protected override void Awake() 
     {
         base.Awake();
-
         GenerateLevelList();
         LoadActiveLevel();
     }
@@ -31,11 +32,7 @@ public class LevelManager : Singleton<LevelManager>
 
     public void NextLevel()
     {
-        _activeLevel += 1;
-        if(_activeLevel > _levelList.Count)
-        {
-            _activeLevel = 0;
-        }
+        SetActiveLevel(_activeLevel + 1);
         SaveActiveLevel();
     }
 
@@ -43,11 +40,11 @@ public class LevelManager : Singleton<LevelManager>
     {
         if (PlayerPrefs.HasKey("ActiveLevel"))
         {
-            _activeLevel = PlayerPrefs.GetInt("ActiveLevel");
+            SetActiveLevel(PlayerPrefs.GetInt("ActiveLevel"));
         }
         else
         {
-            _activeLevel = 1;
+            SetActiveLevel(1);
         }
     }
 
@@ -55,6 +52,20 @@ public class LevelManager : Singleton<LevelManager>
     {
         PlayerPrefs.SetInt("ActiveLevel", _activeLevel);
         PlayerPrefs.Save();
+    }
+
+    private void SetActiveLevel(int _level)
+    {
+        this._activeLevel = _level;
+        if(_activeLevel > _levelList.Count)
+        {
+            _activeLevel = 0;
+        }
+        else
+        {
+            OnLevelChanged?.Invoke();
+        }
+
     }
 
 }

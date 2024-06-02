@@ -1049,7 +1049,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a7dfc38d27a4fe344ac977779748138b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _tilePrefab: {fileID: 253467942796334269, guid: c4105cb9c45eaa149ad688b2ff23bce0, type: 3}
   _tileSprites: []
+  _spawnPoints: []
 --- !u!4 &1634418156
 Transform:
   m_ObjectHideFlags: 0
