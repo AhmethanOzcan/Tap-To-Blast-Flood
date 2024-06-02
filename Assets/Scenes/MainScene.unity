@@ -1050,7 +1050,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _tilePrefab: {fileID: 253467942796334269, guid: c4105cb9c45eaa149ad688b2ff23bce0, type: 3}
-  _tileSprites: []
+  _tileCreationPace: 0.2
+  _tileSprites:
+  - {fileID: 21300000, guid: 8299c67001e5aa043b142c3d27871d1b, type: 3}
+  - {fileID: 21300000, guid: dfc5f05e76c38b549a439f4e7d96bec8, type: 3}
+  - {fileID: 21300000, guid: 213c9af6a6834dd4ca6c5414adbe1ec4, type: 3}
+  - {fileID: 21300000, guid: 540a09dde70c4e6478c6a42e24367820, type: 3}
+  - {fileID: 21300000, guid: d9f3d28f1ffbeac4d83c8da068be1404, type: 3}
+  - {fileID: 21300000, guid: 88df8d8fcba103c4eac9ddca04e20b05, type: 3}
+  - {fileID: 21300000, guid: 738de2786d36b724c9a83065ae129079, type: 3}
+  - {fileID: 21300000, guid: 9cebaf321d60f3e47a38005099456a65, type: 3}
   _spawnPoints: []
 --- !u!4 &1634418156
 Transform:

@@ -5,17 +5,18 @@ using UnityEngine;
 public class TileController : MonoBehaviour
 {
     SpriteRenderer _spriteRenderer;
-    Vector2Int _coordinates;
-    Tile _tile;
+    public Tile _tile;
 
     
     private void Awake() {
         _spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
-    private void Initialize(Tile _tile)
+    public void Initialize(Tile _tile)
     {
         this._tile = _tile;
+        name = string.Format("T:{0},{1}", _tile._coordinates.x.ToString(),  _tile._coordinates.y.ToString());
+        this._spriteRenderer.sortingOrder = _tile._coordinates.y + 1;
         this._spriteRenderer.sprite = TileManager.Instance._tileSprites[(int)_tile._tileType];
     }
 
@@ -26,6 +27,7 @@ public class TileController : MonoBehaviour
     }
 
     private void OnMouseDown() {
-        Debug.Log("Clicked");
+        TileManager.Instance.TileClicked(this);
+        Debug.Log("Clicked on tile at "+ _tile._coordinates.ToString());
     }
 }
