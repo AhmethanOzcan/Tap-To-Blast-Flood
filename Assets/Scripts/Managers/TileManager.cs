@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -12,9 +13,12 @@ public class TileManager : Singleton<TileManager>
     public Sprite[] _tileSprites;
     public Vector3[][] _gridPositions;
     public TileController[][] _tileControllers;
+    public List<List<Vector2Int>> _sameTiles = new List<List<Vector2Int>>();
     [HideInInspector] public List<Transform> _spawnPoints= new List<Transform>();
     public Level _level{get; private set;}
     public bool _isStart{get; private set;}
+
+
 
     protected override void Awake()
     {
@@ -82,7 +86,13 @@ public class TileManager : Singleton<TileManager>
 
             _x++;
         }
+        ReFillSameTiles();
         _isStart = false;
+    }
+
+    private void GenerateTileOnTop(int _x)
+    {
+        GenerateTile(StringToTileType("rand"), _x, _level.grid_height-1);
     }
 
     private void GenerateTile(TileType _type, int _x, int _y)
@@ -143,11 +153,48 @@ public class TileManager : Singleton<TileManager>
         }
     }
 
+    private void ReFillSameTiles()
+    {
+        _sameTiles.Clear();
+        for(int _y = 0; _y < _level.grid_height; _y++)
+        {
+            for(int _x = 0; _x < _level.grid_width; _x++)
+            {
+                _tileControllers[_x][_y].ResetNeighbors();
+            }
+        }
+
+        for(int _y = 0; _y < _level.grid_height; _y++)
+        {
+            for(int _x = 0; _x < _level.grid_width; _x++)
+            {
+                _tileControllers[_x][_y].CheckNeighbors();
+            }
+        }
+    }
+
     public void TileClicked(TileController _tileController)
     {
         Vector2Int _coordinates = _tileController._tile._coordinates;
-        _tileController.Pop();
+        if(!_tileController._inGroup)
+            return;
+        int _index = _tileController._groupIndex;
         
-        GenerateTile(StringToTileType("rand"), _coordinates.x, _level.grid_height-1);
+        _sameTiles[_tileController._groupIndex] = _sameTiles[_tileController._groupIndex].OrderByDescending(v => v.y).ToList();
+        foreach(Vector2Int _tileToPopPos in _sameTiles[_tileController._groupIndex])
+        {
+            _tileControllers[_tileToPopPos.x][_tileToPopPos.y].Pop();
+            GenerateTileOnTop(_tileToPopPos.x);
+        }
+
+        ReFillSameTiles();
     }
+
+    public void Bomb(Vector2Int coordinates)
+    {
+        //Check tiles around coordinates
+        //Add to a list
+        // Destroy them
+    }
+
 }
