@@ -7,18 +7,16 @@ public class GridController : MonoBehaviour
 {
     [Header("Variables")]
     [SerializeField] float _boardTweenTime = 0.5f;
-    [SerializeField] float _colliderPreventSquishValue = 0.01f;
+
     SpriteRenderer _spriteRenderer;
-    EdgeCollider2D[] _borders;
     int _width;
     int _height;
     float _tileSize;
-
+    Vector2 _gridSize;
 
     private void Awake()
     {
         _spriteRenderer = GetComponent<SpriteRenderer>();
-        _borders        = GetComponentsInChildren<EdgeCollider2D>();
     }
 
     private void Start() {
@@ -32,9 +30,9 @@ public class GridController : MonoBehaviour
         HandleGridSize();
         transform.LeanScale(Vector2.one, _boardTweenTime).setEaseInOutBounce();
         yield return new WaitForSeconds(_boardTweenTime);
-        HandleBorders();
+
         CreateSpawnPoints();
-        TileManager.Instance.FillGrid();
+        TileManager.Instance.FillGrid(this.transform);
     }
 
     private void CreateSpawnPoints()
@@ -59,37 +57,12 @@ public class GridController : MonoBehaviour
     {
         _width                          = LevelManager.Instance._levelList[LevelManager.Instance._activeLevel-1].grid_width;
         _height                         = LevelManager.Instance._levelList[LevelManager.Instance._activeLevel-1].grid_height;
-        BoxCollider2D _prefabCollider   = TileManager.Instance._tilePrefab.GetComponent<BoxCollider2D>();
-        _tileSize                       = _prefabCollider.size.x + _colliderPreventSquishValue;
-    }
-
-    private void HandleBorders()
-    {
-        Vector2 _borderSizeLeftV        = new Vector2(-(_tileSize-_colliderPreventSquishValue) * _height, 0);
-        Vector2 _borderSizeRightV       = new Vector2((_tileSize-_colliderPreventSquishValue) * _height, 0);
-        Vector2 _borderSizeLeftH        = new Vector2(-_tileSize * _width, 0);
-        Vector2 _borderSizeRightH       = new Vector2(_tileSize * _width, 0);
-        Vector2 _offsetV                = new Vector2(0, -_tileSize * _width);
-        Vector2 _offsetH                = new Vector2(0, -(_tileSize-_colliderPreventSquishValue/2) * _height);
-        foreach(EdgeCollider2D _border in _borders)
-        {
-            if(_border.gameObject.transform.localEulerAngles.z == 0 || _border.gameObject.transform.localEulerAngles.z == 180)
-            {
-                _border.points  = new Vector2[] { _borderSizeLeftH, _borderSizeRightH };
-                _border.offset  = _offsetH;
-            }
-            else
-            {
-                _border.points  = new Vector2[] { _borderSizeLeftV, _borderSizeRightV };
-                _border.offset  = _offsetV;
-            }
-            
-        }
+        _tileSize                       = TileManager.Instance._tilePrefab.GetComponent<SpriteRenderer>().bounds.size.x;
     }
 
     private void HandleGridSize()
     {
-        Vector2 _gridSize = new Vector2(0.4f + _tileSize * _width, 0.4f + (_tileSize-_colliderPreventSquishValue/2) * _height);
+        _gridSize = new Vector2(0.4f + _tileSize * _width, 0.4f + _tileSize * _height);
         _spriteRenderer.size = _gridSize;
     }
 

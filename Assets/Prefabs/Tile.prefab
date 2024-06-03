@@ -11,8 +11,7 @@ GameObject:
   - component: {fileID: 8443745489845613312}
   - component: {fileID: 6942297445774522613}
   - component: {fileID: -5534914494324119904}
-  - component: {fileID: 4069304414677201714}
-  - component: {fileID: 5241870534967766728}
+  - component: {fileID: 7119542188077871757}
   m_Layer: 0
   m_Name: Tile
   m_TagString: Untagged
@@ -99,7 +98,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3112f85ff040f52439955b7e512ad508, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!61 &4069304414677201714
+  _fallDownSpeed: 10
+--- !u!61 &7119542188077871757
 BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -131,7 +131,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: -0.03}
+  m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -142,32 +142,5 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.34, y: 0.34}
+  m_Size: {x: 0.35, y: 0.35}
   m_EdgeRadius: 0
---- !u!50 &5241870534967766728
-Rigidbody2D:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 253467942796334269}
-  m_BodyType: 0
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
-  m_GravityScale: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_Interpolate: 0
-  m_SleepingMode: 1
-  m_CollisionDetection: 1
-  m_Constraints: 5
