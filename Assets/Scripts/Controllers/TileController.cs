@@ -27,7 +27,7 @@ public class TileController : MonoBehaviour
     }
 
     private void OnMouseDown() {
-        TileManager.Instance.TileClicked(this);
         Debug.Log("Clicked on tile at "+ _tile._coordinates.ToString());
+        TileManager.Instance.TileClicked(this);
     }
 }
