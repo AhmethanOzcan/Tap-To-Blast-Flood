@@ -164,5 +164,4 @@ public class TileController : MonoBehaviour
         this._spriteRenderer.sprite =  TileManager.Instance._tileSprites[(int)this._tile._tileType];
     }
 
-
 }

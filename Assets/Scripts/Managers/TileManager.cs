@@ -209,10 +209,25 @@ public class TileManager : Singleton<TileManager>
         {
             // NORMAL BLOCK
             int _index = _tileController._groupIndex;
-            _sameTiles[_tileController._groupIndex] = _sameTiles[_tileController._groupIndex].OrderByDescending(v => v.y).ToList();
-            if(_sameTiles[_tileController._groupIndex].Count < 5)
+            List<Vector2Int> _tilesToPop    = new List<Vector2Int>();
+            foreach (Vector2Int _pos in _sameTiles[_tileController._groupIndex])
             {
-                foreach(Vector2Int _tileToPopPos in _sameTiles[_tileController._groupIndex])
+                _tilesToPop.Add(_pos);
+                
+                if(_pos.x != 0 && (_tileControllers[_pos.x-1][_pos.y]._tile._tileType == TileType.bo || _tileControllers[_pos.x-1][_pos.y]._tile._tileType == TileType.v))
+                    _tilesToPop.Add(new Vector2Int(_pos.x-1, _pos.y));
+                if(_pos.y != 0 && (_tileControllers[_pos.x][_pos.y-1]._tile._tileType == TileType.bo || _tileControllers[_pos.x][_pos.y-1]._tile._tileType == TileType.v))
+                    _tilesToPop.Add(new Vector2Int(_pos.x, _pos.y-1));
+                if(_pos.x != _level.grid_width - 1 && (_tileControllers[_pos.x+1][_pos.y]._tile._tileType == TileType.bo || _tileControllers[_pos.x+1][_pos.y]._tile._tileType == TileType.v))
+                    _tilesToPop.Add(new Vector2Int(_pos.x+1, _pos.y));
+                if(_pos.y != _level.grid_height - 1 && (_tileControllers[_pos.x][_pos.y+1]._tile._tileType == TileType.bo || _tileControllers[_pos.x][_pos.y+1]._tile._tileType == TileType.v))
+                    _tilesToPop.Add(new Vector2Int(_pos.x, _pos.y+1));
+            }
+            _tilesToPop = _tilesToPop.OrderByDescending(v => v.y).ToList();
+            if(_tilesToPop.Count < 5)
+            {
+                // NO TNT GENERATION
+                foreach(Vector2Int _tileToPopPos in _tilesToPop)
                 {
                     _tileControllers[_tileToPopPos.x][_tileToPopPos.y].Pop();
                     GenerateTileOnTop(_tileToPopPos.x);
@@ -220,10 +235,13 @@ public class TileManager : Singleton<TileManager>
             }
             else
             {
-                foreach(Vector2Int _tileToPopPos in _sameTiles[_tileController._groupIndex])
+                // TNT GENERATION
+                foreach(Vector2Int _tileToPopPos in _tilesToPop)
                 {
                     if(_tileController._tile._coordinates == _tileToPopPos)
+                    {
                         _tileControllers[_tileToPopPos.x][_tileToPopPos.y].TransformToTNT();
+                    }
                     else
                     {
                         _tileControllers[_tileToPopPos.x][_tileToPopPos.y].Pop();
