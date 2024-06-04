@@ -9,10 +9,11 @@ public class TileController : MonoBehaviour
     [SerializeField] float _fallDownSpeed = 2f;
     [SerializeField] GameplayUIController _gameplayUI;
 
-    SpriteRenderer _spriteRenderer;
+    public SpriteRenderer _spriteRenderer;
     public Tile _tile;
     public bool _inGroup;
     public int _groupIndex;
+    public bool _canTNT;
     
     private void Awake() {
         _spriteRenderer = GetComponent<SpriteRenderer>();
@@ -23,6 +24,7 @@ public class TileController : MonoBehaviour
         this._tile                  = _tile;
         this._groupIndex            = -1;
         this._inGroup               = false;
+        this._canTNT                = false;
         this._spriteRenderer.sprite = TileManager.Instance._tileSprites[(int)_tile._tileType];
         FallDown(this._tile._coordinates.y);
     }
@@ -135,10 +137,31 @@ public class TileController : MonoBehaviour
         Destroy(this.gameObject);
     }
 
+    public void SetCanTNT(bool _value)
+    {
+        if(_value)
+        {
+            this._spriteRenderer.sprite = TileManager.Instance._tileTNTSprites[(int)this._tile._tileType];
+            this._canTNT = true;
+        }
+        else
+        {
+            this._canTNT                = false;
+            this._spriteRenderer.sprite = TileManager.Instance._tileSprites[(int)this._tile._tileType];
+        }
+    }
+
     public void ResetNeighbors()
     {
-        this._groupIndex = -1;
-        this._inGroup = false;
+        this._groupIndex            = -1;
+        this._inGroup               = false;
+        SetCanTNT(false);
+    }
+
+    public void TransformToTNT()
+    {
+        this._tile._tileType        = TileType.t;
+        this._spriteRenderer.sprite =  TileManager.Instance._tileSprites[(int)this._tile._tileType];
     }
 
 

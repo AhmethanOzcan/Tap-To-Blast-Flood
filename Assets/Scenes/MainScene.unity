@@ -157,7 +157,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.009686451, y: 0.03710696}
   m_AnchorMax: {x: 0.5, y: 0.9760001}
-  m_AnchoredPosition: {x: 0.29199982, y: -0.52031326}
+  m_AnchoredPosition: {x: 0.2919922, y: -0.5203171}
   m_SizeDelta: {x: -0.58000183, y: 0.21099854}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &13058211
@@ -614,7 +614,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.0000076293945, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &793136463
@@ -961,10 +961,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1804405621}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.24800001, y: 0.23544654}
-  m_AnchorMax: {x: 0.7516865, y: 0.7644559}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0.13357511, y: 0.22563127}
+  m_AnchorMax: {x: 0.86885846, y: 0.76442087}
+  m_AnchoredPosition: {x: -0.5, y: 0.5}
+  m_SizeDelta: {x: 2.2386017, y: -1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1495943171
 MonoBehaviour:
@@ -1013,12 +1013,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 16.25
+  m_fontSize: 38.65
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 12
-  m_fontSizeMax: 24
+  m_fontSizeMin: 1
+  m_fontSizeMax: 60
   m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -1096,6 +1096,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _tilePrefab: {fileID: 253467942796334269, guid: c4105cb9c45eaa149ad688b2ff23bce0, type: 3}
   _tileCreationPace: 0.2
+  _clickCooldown: 1
   _tileSprites:
   - {fileID: 21300000, guid: 8299c67001e5aa043b142c3d27871d1b, type: 3}
   - {fileID: 21300000, guid: dfc5f05e76c38b549a439f4e7d96bec8, type: 3}
@@ -1105,6 +1106,11 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 88df8d8fcba103c4eac9ddca04e20b05, type: 3}
   - {fileID: 21300000, guid: 738de2786d36b724c9a83065ae129079, type: 3}
   - {fileID: 21300000, guid: 9cebaf321d60f3e47a38005099456a65, type: 3}
+  _tileTNTSprites:
+  - {fileID: 21300000, guid: 682974af3f647ee428a1cbea269d492e, type: 3}
+  - {fileID: 21300000, guid: 6d3dc2fe6b31de844bb012a0818ab94f, type: 3}
+  - {fileID: 21300000, guid: ddda207a870490d47b48b47cfa14c7ac, type: 3}
+  - {fileID: 21300000, guid: d8b703da42a806f4f84489b8e3231c54, type: 3}
   _spawnPoints: []
 --- !u!4 &1634418156
 Transform:

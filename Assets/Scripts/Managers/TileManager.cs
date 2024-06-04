@@ -9,16 +9,17 @@ public class TileManager : Singleton<TileManager>
 {
     public GameObject _tilePrefab;
     [SerializeField] float _tileCreationPace;
-
+    [SerializeField] float _clickCooldown = 1f;
     public Sprite[] _tileSprites;
+    public Sprite[] _tileTNTSprites;
     public Vector3[][] _gridPositions;
     public TileController[][] _tileControllers;
     public List<List<Vector2Int>> _sameTiles = new List<List<Vector2Int>>();
     [HideInInspector] public List<Transform> _spawnPoints= new List<Transform>();
     public Level _level{get; private set;}
     public bool _isStart{get; private set;}
-
-
+    private bool _isClickable;
+    GameplayUIController _gameplayUI;
 
     protected override void Awake()
     {
@@ -27,7 +28,7 @@ public class TileManager : Singleton<TileManager>
 
     private void Start()
     {
-        
+        _isClickable = true;
         _level = LevelManager.Instance._levelList[LevelManager.Instance._activeLevel - 1];
         LevelManager.Instance.OnLevelChanged += OnLevelChanged;
     }
@@ -36,6 +37,7 @@ public class TileManager : Singleton<TileManager>
     public void FillGrid(Transform _gridTransform)
     {
         _isStart = true;
+        _gameplayUI = FindObjectOfType<GameplayUIController>();
         _tileControllers = new TileController[_level.grid_width][];
         for (int i = 0; i < _level.grid_width; i++)
         {
@@ -168,33 +170,104 @@ public class TileManager : Singleton<TileManager>
         {
             for(int _x = 0; _x < _level.grid_width; _x++)
             {
-                _tileControllers[_x][_y].CheckNeighbors();
+                TileController _tileC = _tileControllers[_x][_y];
+                if(!_tileC._inGroup && (int)_tileC._tile._tileType < 5)
+                {
+                    _tileC.CheckNeighbors();
+                }
+                if(_tileC._inGroup && !_tileC._canTNT && (int)_tileC._tile._tileType < 4 && _sameTiles[_tileC._groupIndex].Count >= 5)
+                {
+                    foreach (Vector2Int _pos in _sameTiles[_tileC._groupIndex])
+                    {
+                        _tileControllers[_pos.x][_pos.y].SetCanTNT(true);
+                    }
+                }
             }
         }
+
+        StartCoroutine(ClickableAgainRoutine());
+    }
+
+    private IEnumerator ClickableAgainRoutine()
+    {
+        yield return new WaitForSeconds(_clickCooldown);
+        _isClickable = true;
     }
 
     public void TileClicked(TileController _tileController)
     {
-        Vector2Int _coordinates = _tileController._tile._coordinates;
-        if(!_tileController._inGroup)
+        if(!_isClickable || _gameplayUI.GetMoves() == 0)
             return;
-        int _index = _tileController._groupIndex;
-        
-        _sameTiles[_tileController._groupIndex] = _sameTiles[_tileController._groupIndex].OrderByDescending(v => v.y).ToList();
-        foreach(Vector2Int _tileToPopPos in _sameTiles[_tileController._groupIndex])
+        _isClickable = false;
+        Vector2Int _coordinates = _tileController._tile._coordinates;
+        if((_tileController._tile._tileType != TileType.t && !_tileController._inGroup) || (int)_tileController._tile._tileType > 4)
         {
-            _tileControllers[_tileToPopPos.x][_tileToPopPos.y].Pop();
-            GenerateTileOnTop(_tileToPopPos.x);
+            _isClickable = true;
+            return;
         }
+        else if((int)_tileController._tile._tileType < 4)
+        {
+            // NORMAL BLOCK
+            int _index = _tileController._groupIndex;
+            _sameTiles[_tileController._groupIndex] = _sameTiles[_tileController._groupIndex].OrderByDescending(v => v.y).ToList();
+            if(_sameTiles[_tileController._groupIndex].Count < 5)
+            {
+                foreach(Vector2Int _tileToPopPos in _sameTiles[_tileController._groupIndex])
+                {
+                    _tileControllers[_tileToPopPos.x][_tileToPopPos.y].Pop();
+                    GenerateTileOnTop(_tileToPopPos.x);
+                }
+            }
+            else
+            {
+                foreach(Vector2Int _tileToPopPos in _sameTiles[_tileController._groupIndex])
+                {
+                    if(_tileController._tile._coordinates == _tileToPopPos)
+                        _tileControllers[_tileToPopPos.x][_tileToPopPos.y].TransformToTNT();
+                    else
+                    {
+                        _tileControllers[_tileToPopPos.x][_tileToPopPos.y].Pop();
+                        GenerateTileOnTop(_tileToPopPos.x);
+                    }
+                }
+            }
+            
+        }
+        else
+        {
+            //TNT
+            int _blastRadius    = _tileController._inGroup ? 7 : 5;
+            List<TileController> _tilesToPop = new List<TileController>();
+            int _xClicked       = _tileController._tile._coordinates.x;
+            int _yClicked       = _tileController._tile._coordinates.y;
+            if(_tileController._inGroup)
+            {
+                foreach(Vector2Int _groupTile in _sameTiles[_tileController._groupIndex])
+                {
+                    _tilesToPop.Add(_tileControllers[_groupTile.x][_groupTile.y]);
+                }
+            }
 
+            for(int _y = _yClicked - _blastRadius / 2; _y <= _yClicked + _blastRadius / 2; _y++)
+            {
+                for(int _x = _xClicked - _blastRadius / 2; _x <= _xClicked + _blastRadius / 2; _x++)
+                {
+                    if(_x < 0 || _y < 0 || _x >= _level.grid_width || _y >= _level.grid_height || (_tileController._inGroup && _tileController._groupIndex == _tileControllers[_x][_y]._groupIndex))
+                        continue;
+                    
+                    _tilesToPop.Add(_tileControllers[_x][_y]);
+                }
+            }
+            _tilesToPop = _tilesToPop.OrderByDescending(v => v._tile._coordinates.y).ToList();
+            foreach(TileController _popMe in _tilesToPop)
+            {
+                _popMe.Pop();
+                GenerateTileOnTop(_popMe._tile._coordinates.x);
+            }
+        }
+        
+        _gameplayUI.DecreaseMoves();
         ReFillSameTiles();
-    }
-
-    public void Bomb(Vector2Int coordinates)
-    {
-        //Check tiles around coordinates
-        //Add to a list
-        // Destroy them
     }
 
 }

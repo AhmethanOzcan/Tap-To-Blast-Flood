@@ -16,4 +16,9 @@ public class GameManager : Singleton<GameManager>
         SceneManager.LoadScene(1);
     }
 
+    public void OpenMainScene()
+    {
+        SceneManager.LoadScene(0);
+    }
+
 }
