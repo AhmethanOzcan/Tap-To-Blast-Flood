@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -54,6 +55,7 @@ public class GameplayUIController : MonoBehaviour
         {
             if(_goalCount[i] == 0)
             {
+                _goals[i].text      = "-1";
                 _goals[i].transform.parent.gameObject.SetActive(false);
             }
             else
@@ -73,30 +75,10 @@ public class GameplayUIController : MonoBehaviour
     {
         if(_remainingMoves.text == "0")
         {
-            bool _lost = false;
-            for(int i = 0; i < _goals.Length; i++)
-            {
-                if(_goals[i].transform.parent.gameObject.activeSelf)
-                {
-                    _lost = true;
-                }
-            }
-
-            Button[] _buttons = _popUpUI.GetComponentsInChildren<Button>();
-            _buttons[0].onClick.AddListener(() =>GameManager.Instance.OpenLevelScene());
-            _buttons[1].onClick.AddListener(() =>GameManager.Instance.OpenMainScene());
-            if(_lost)
-            {
-                TextMeshProUGUI[] _texts = _popUpUI.GetComponentsInChildren<TextMeshProUGUI>();
-                _texts[0].text = "Retry Level!";
-                _texts[1].text = "Level Failed!";
-            }
+            if(CheckSucces())
+                StartCoroutine(SuccesRoutine());
             else
-            {
-                LevelManager.Instance.NextLevel();
-            }
-            _popUpUI.gameObject.SetActive(true);
-            
+                StartCoroutine(FailRoutine());
         }
     }
 
@@ -105,9 +87,78 @@ public class GameplayUIController : MonoBehaviour
         return int.Parse(_remainingMoves.text);
     }
 
-    // Update is called once per frame
-    void Update()
+    public void DecreaseGoal(TileType _tileType)
     {
+        if((int)_tileType < 5)
+            return;
+        TextMeshProUGUI _goal = _goals[0];
         
+        if(_tileType == TileType.bo)
+        {
+            _goal = _goals[0];
+        }
+        else if(_tileType == TileType.s)
+        {
+            _goal = _goals[1];
+        }
+        else if(_tileType == TileType.v)
+        {
+            _goal = _goals[2];
+        }
+
+        if(int.Parse(_goal.text) != 0)
+        {
+            _goal.text = (int.Parse(_goal.text)-1).ToString();
+            if(_goal.text == "0")
+            {
+                _goal.text = "<sprite index=0>";
+                _goal.ForceMeshUpdate();
+                if(CheckSucces())
+                {
+                    StartCoroutine(SuccesRoutine());
+                }
+            }
+            
+        }
+    }
+
+    private bool CheckSucces()
+    {
+        foreach(TextMeshProUGUI _goal in _goals)
+        {
+            if(_goal.text != "-1" && _goal.text != "<sprite index=0>")
+                return false;
+        }
+
+        return true;
+    }
+
+    private IEnumerator FailRoutine()
+    {
+        yield return null;
+        Button[] _buttons = _popUpUI.GetComponentsInChildren<Button>();
+        _buttons[0].onClick.AddListener(() =>GameManager.Instance.OpenLevelScene());
+        _buttons[1].onClick.AddListener(() =>GameManager.Instance.OpenMainScene());
+        TextMeshProUGUI[] _texts = _popUpUI.GetComponentsInChildren<TextMeshProUGUI>();
+        _texts[0].text = "Retry Level!";
+        _texts[1].text = "Level Failed!";
+        _popUpUI.gameObject.SetActive(true);
+    }
+
+    private IEnumerator SuccesRoutine()
+    {
+        yield return null;
+        LevelManager.Instance.NextLevel();
+        Button[] _buttons = _popUpUI.GetComponentsInChildren<Button>();
+        if(LevelManager.Instance._activeLevel != 0)
+            _buttons[0].onClick.AddListener(() =>GameManager.Instance.OpenLevelScene());
+        else
+        {
+            _buttons[0].onClick.AddListener(() =>GameManager.Instance.OpenMainScene());
+            _buttons[0].GetComponentInChildren<TextMeshProUGUI>().text = "Finished!";
+        }
+        
+        _buttons[1].onClick.AddListener(() =>GameManager.Instance.OpenMainScene());
+        _popUpUI.gameObject.SetActive(true);
     }
 }

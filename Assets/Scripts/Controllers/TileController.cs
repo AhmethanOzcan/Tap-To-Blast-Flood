@@ -35,12 +35,12 @@ public class TileController : MonoBehaviour
     }
 
 
-    private void FallDown(int _y)
+    public void FallDown(int _y)
     {
         int _x = this._tile._coordinates.x;
         float _targetY = TileManager.Instance._gridPositions[_x][_y].y;
         float _time = Math.Abs(_targetY - this.transform.position.y) / _fallDownSpeed;
-        this.transform.LeanMoveLocalY(_targetY, _time).setEaseOutSine();
+        this.transform.LeanMoveLocalY(_targetY, _time);
         this._tile._coordinates = new Vector2Int(_x, _y);
         SetName();
         this._spriteRenderer.sortingOrder   = _y + 1;
@@ -53,13 +53,13 @@ public class TileController : MonoBehaviour
         int _x = this._tile._coordinates.x;
         int _y = this._tile._coordinates.y;
 
-        if(_y != 0 && this._tile._tileType == TileManager.Instance._tileControllers[_x][_y-1]._tile._tileType)
+        if(_y != 0 && TileManager.Instance._tileControllers[_x][_y-1] != null && this._tile._tileType == TileManager.Instance._tileControllers[_x][_y-1]._tile._tileType)
             _sameTypeNear.Add(TileManager.Instance._tileControllers[_x][_y-1]);
-        if(_x != 0 && this._tile._tileType == TileManager.Instance._tileControllers[_x-1][_y]._tile._tileType)
+        if(_x != 0 && TileManager.Instance._tileControllers[_x-1][_y] != null && this._tile._tileType == TileManager.Instance._tileControllers[_x-1][_y]._tile._tileType)
             _sameTypeNear.Add(TileManager.Instance._tileControllers[_x-1][_y]);
-        if(_x != TileManager.Instance._level.grid_width-1 && this._tile._tileType == TileManager.Instance._tileControllers[_x+1][_y]._tile._tileType)
+        if(_x != TileManager.Instance._level.grid_width-1 && TileManager.Instance._tileControllers[_x+1][_y] != null && this._tile._tileType == TileManager.Instance._tileControllers[_x+1][_y]._tile._tileType)
             _sameTypeNear.Add(TileManager.Instance._tileControllers[_x+1][_y]);
-        if(_y != TileManager.Instance._level.grid_height-1 && this._tile._tileType == TileManager.Instance._tileControllers[_x][_y+1]._tile._tileType)
+        if(_y != TileManager.Instance._level.grid_height-1 && TileManager.Instance._tileControllers[_x][_y+1] != null && this._tile._tileType == TileManager.Instance._tileControllers[_x][_y+1]._tile._tileType)
             _sameTypeNear.Add(TileManager.Instance._tileControllers[_x][_y+1]);
         
         if(_sameTypeNear.Count == 0)
@@ -129,6 +129,8 @@ public class TileController : MonoBehaviour
         {
             _y++;
             TileController _tileToAlert = TileManager.Instance._tileControllers[_x][_y];
+            if(_tileToAlert == null || _tileToAlert._tile._coordinates.y == 0)
+                continue;
             if(_tileToAlert._tile._tileType == TileType.bo || _tileToAlert._tile._tileType == TileType.s)
                 break;
             _tileToAlert.AlertToFall();
@@ -139,6 +141,8 @@ public class TileController : MonoBehaviour
 
     public void SetCanTNT(bool _value)
     {
+        if((int)this._tile._tileType > 4)
+            return;
         if(_value)
         {
             this._spriteRenderer.sprite = TileManager.Instance._tileTNTSprites[(int)this._tile._tileType];

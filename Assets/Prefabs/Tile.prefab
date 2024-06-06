@@ -99,6 +99,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _fallDownSpeed: 10
+  _gameplayUI: {fileID: 0}
+  _spriteRenderer: {fileID: 0}
+  _inGroup: 0
+  _groupIndex: 0
+  _canTNT: 0
 --- !u!61 &7119542188077871757
 BoxCollider2D:
   m_ObjectHideFlags: 0

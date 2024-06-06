@@ -1095,6 +1095,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _tilePrefab: {fileID: 253467942796334269, guid: c4105cb9c45eaa149ad688b2ff23bce0, type: 3}
+  _burstParticlePrefab: {fileID: 5093199920265830861, guid: 69556107dddee5b4ab64e61b1223c592, type: 3}
+  _burstObstaclePrefab: {fileID: 613285423954741403, guid: 7fad6c16da7104d4cb53ec7c20baeb3b, type: 3}
   _tileCreationPace: 0.2
   _clickCooldown: 1
   _tileSprites:
@@ -1111,6 +1113,22 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 6d3dc2fe6b31de844bb012a0818ab94f, type: 3}
   - {fileID: 21300000, guid: ddda207a870490d47b48b47cfa14c7ac, type: 3}
   - {fileID: 21300000, guid: d8b703da42a806f4f84489b8e3231c54, type: 3}
+  _burstMaterials:
+  - {fileID: 2100000, guid: 6c9df8182ab1fb845997f0afd8bf5e85, type: 2}
+  - {fileID: 2100000, guid: a792962426d146149a3badad565b4ba0, type: 2}
+  - {fileID: 2100000, guid: 10ac69411ed09f44b862210627c60186, type: 2}
+  - {fileID: 2100000, guid: 2df0e95caa2dfb445949ed1462127515, type: 2}
+  _burstObstacleSprites:
+  - {fileID: 21300000, guid: 51a0770cd9a225f4390e8678e5219c1d, type: 3}
+  - {fileID: 21300000, guid: bf510e69f29c03542a1074209992b194, type: 3}
+  - {fileID: 21300000, guid: fb2708c73de426d4ca2f58e99b21c71d, type: 3}
+  - {fileID: 21300000, guid: 1c9ee2247e119da4fb106935567398fb, type: 3}
+  - {fileID: 21300000, guid: 8e75093c8aa32704aa3d4ca53b5a1462, type: 3}
+  - {fileID: 21300000, guid: 14daaf0973497ee458220964519794ad, type: 3}
+  - {fileID: 21300000, guid: 8580c32ed69c4da47a84a9edd8e86130, type: 3}
+  - {fileID: 21300000, guid: dda1ac4ee62f2b84dbd4a0038891c09d, type: 3}
+  - {fileID: 21300000, guid: 679c0589553b1ef4faa8aa5e1a230331, type: 3}
+  _vaseBreakSprite: {fileID: 21300000, guid: 1bb6029fd995bf24a950b9c03aaf8cbd, type: 3}
   _spawnPoints: []
 --- !u!4 &1634418156
 Transform:
@@ -1273,19 +1291,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1804405623}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1634418158}
-        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: OpenLevelScene
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1804405623
 MonoBehaviour:
   m_ObjectHideFlags: 0

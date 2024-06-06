@@ -6,14 +6,17 @@ using UnityEngine.UI;
 
 public class MainMenuUIController : MonoBehaviour
 {
+    Button _startButton;
     TextMeshProUGUI _startButtonText;
 
     private void Awake() {
-        GameObject _startButton = GameObject.Find("Start Button");
-        _startButtonText        = _startButton.GetComponentInChildren<TextMeshProUGUI>();
+        _startButton         = this.GetComponentInChildren<Button>();
+        _startButtonText     = _startButton.GetComponentInChildren<TextMeshProUGUI>();
     }
     void Start()
     {
+        if(LevelManager.Instance._activeLevel > 0) 
+            _startButton.onClick.AddListener(() =>GameManager.Instance.OpenLevelScene());
         ChangeStartButtonText();
     }
 
