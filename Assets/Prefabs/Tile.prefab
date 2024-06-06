@@ -98,7 +98,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3112f85ff040f52439955b7e512ad508, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _fallDownSpeed: 10
+  _fallDownSpeed: 15
   _gameplayUI: {fileID: 0}
   _spriteRenderer: {fileID: 0}
   _inGroup: 0

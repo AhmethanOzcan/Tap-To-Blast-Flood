@@ -11,7 +11,8 @@ public class TileManager : Singleton<TileManager>
     public GameObject _burstParticlePrefab;
     public GameObject _burstObstaclePrefab;
     [SerializeField] float _tileCreationPace;
-    [SerializeField] float _clickCooldown = 1f;
+    [SerializeField] float _helpTimer = 5f;
+    [SerializeField] float _darkenFactor = 0.8f;
     public Sprite[] _tileSprites;
     public Sprite[] _tileTNTSprites;
     public Material[] _burstMaterials;
@@ -24,6 +25,8 @@ public class TileManager : Singleton<TileManager>
     public Level _level{get; private set;}
     public bool _isStart{get; private set;}
     private bool _isClickable;
+    private bool _helpGot;
+    float _lastMoveTimer;
     GameplayUIController _gameplayUI;
     Transform _gridTransform;
 
@@ -35,9 +38,14 @@ public class TileManager : Singleton<TileManager>
     private void Start()
     {
         _isClickable = true;
+        _isStart = true;
         if(LevelManager.Instance._activeLevel > 0)
             _level = LevelManager.Instance._levelList[LevelManager.Instance._activeLevel - 1];
         LevelManager.Instance.OnLevelChanged += OnLevelChanged;
+    }
+
+    private void Update() {
+        OpenHelp();
     }
 
 
@@ -66,7 +74,7 @@ public class TileManager : Singleton<TileManager>
     private void FillGridTransforms(Transform _gridTransform)
     {
         float _tileSize = this._tilePrefab.GetComponent<SpriteRenderer>().bounds.size.x;
-        float _yPoint   =  _gridTransform.position.y - _spawnPoints[0].position.y - _tileSize * _level.grid_height/2 + (_level.grid_height%2)*_tileSize/2 + 0.2f;
+        float _yPoint   =  _gridTransform.position.y - _spawnPoints[0].position.y - _tileSize * _level.grid_height/2 + (_level.grid_height%2)*_tileSize/2 + Math.Abs((_level.grid_height%2)-1)*0.2f;
         for (int i = 0; i < _level.grid_height; i++)
         {
            for (int j = 0; j < _level.grid_width; j++)
@@ -165,17 +173,31 @@ public class TileManager : Singleton<TileManager>
 
     private void ReFillSameTiles()
     {
-        _sameTiles.Clear();
-        for(int _y = 0; _y < _level.grid_height; _y++)
+        StartCoroutine(LeanTweenWaitRoutine());
+        
+    }
+
+    private IEnumerator LeanTweenWaitRoutine()
+    {
+        
+        while (LeanTween.tweensRunning > 0)
         {
-            for(int _x = 0; _x < _level.grid_width; _x++)
+            yield return null;
+        }
+        if(!_isStart)
+        {
+            _sameTiles.Clear();
+            for(int _y = 0; _y < _level.grid_height; _y++)
             {
-                if(_tileControllers[_x][_y] == null)
-                    continue;
-                _tileControllers[_x][_y].ResetNeighbors();
+                for(int _x = 0; _x < _level.grid_width; _x++)
+                {
+                    if(_tileControllers[_x][_y] == null)
+                        continue;
+                    _tileControllers[_x][_y].ResetNeighbors();
+                }
             }
         }
-
+        
         for(int _y = 0; _y < _level.grid_height; _y++)
         {
             for(int _x = 0; _x < _level.grid_width; _x++)
@@ -196,13 +218,8 @@ public class TileManager : Singleton<TileManager>
                 }
             }
         }
-        StartCoroutine(ClickableAgainRoutine());
-    }
-
-    private IEnumerator ClickableAgainRoutine()
-    {
-        yield return new WaitForSeconds(_clickCooldown);
         _isClickable = true;
+        _lastMoveTimer = 0;
     }
 
     public void TileClicked(TileController _tileController)
@@ -258,7 +275,11 @@ public class TileManager : Singleton<TileManager>
         }
         
         _gameplayUI.DecreaseMoves();
-        ReFillSameTiles();
+        if(_gameplayUI.GetMoves() != 0)
+        {
+            ReFillSameTiles();
+        }
+            
     }
 
     private void PopEverythingInTheList(List<Vector2Int> _tilesToPop, bool _generateTnt, Vector2Int _clickedPos)
@@ -294,6 +315,7 @@ public class TileManager : Singleton<TileManager>
                 
             }
         }
+        CloseHelp();
     }
 
     private void BurstParticle(Vector2Int _tileToPopPos, TileType _tileToPopType)
@@ -365,6 +387,61 @@ public class TileManager : Singleton<TileManager>
                 {
                     GenerateTileOnTop(_popMePos.x);
                 }
+            }
+        }
+    }
+
+    private void OpenHelp()
+    {
+        if(_isStart)
+            return;
+        _lastMoveTimer += Time.deltaTime;
+        if(_lastMoveTimer > _helpTimer && !_helpGot)
+        {
+            _helpGot = true;
+            bool _isThereAny = false;
+            foreach(List<Vector2Int> _pos in _sameTiles)
+            {
+                if(_pos.Count >= 5)
+                {
+                    _isThereAny = true;
+                    break;
+                }
+            }
+            if(!_isThereAny)
+                return;
+            int _index = Random.Range(0, _sameTiles.Count);
+            while(_sameTiles[_index].Count < 5)
+                _index = Random.Range(0, _sameTiles.Count);
+            for(int _y = 0; _y < _level.grid_height; _y++)
+            {
+                for(int _x = 0; _x < _level.grid_width; _x++)
+                {
+                    if(_tileControllers[_x][_y] == null)
+                        continue;
+
+                    if(!_sameTiles[_index].Contains(new Vector2Int(_x, _y)))
+                    {
+                        _tileControllers[_x][_y]._spriteRenderer.color = new Color(_darkenFactor, _darkenFactor, _darkenFactor, 1f);
+                    }
+                }
+            }
+        }
+        
+    }
+
+    private void CloseHelp()
+    {
+        _lastMoveTimer = 0;
+        _helpGot = false;
+        for(int _y = 0; _y < _level.grid_height; _y++)
+        {
+            for(int _x = 0; _x < _level.grid_width; _x++)
+            {
+                if(_tileControllers[_x][_y] == null)
+                    continue;
+                else
+                    _tileControllers[_x][_y]._spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
             }
         }
     }
